@@ -30,11 +30,17 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
+    console.log("Received Data:", req.body); 
     const { email, password } = req.body;
-    login(email, password);
+    const token = login(email, password);
+
+    res.status(200).send({ message: "User logged in successfully", token });
   } catch (error) {
-    res.status(500).send({ error: "Internal server error" });
-  }
+    if (error.status == 400) {
+      return res.status(400).send({ error: error.message });
+    }
+    res.status(500).send({ error: "login failed, please check your credintials" });
+  } 
 });
 
 const port = process.env.PORT || 3000;

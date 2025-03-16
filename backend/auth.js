@@ -28,4 +28,16 @@ export function createUser(email, password) {
   return token;
 }
 
-export function login(email, password) {}
+export function login(email, password) {
+    const user = db.prepare("SELECT * from users WHERE email = ?").get(email);
+
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+        const error = new Error("User creation failed, invalid credientials");
+        error.status = 400;
+        throw error;
+    }
+
+    const token = jwt.sign({id: user.id}, secretKey, {expiresIn: '1h'});
+
+    return token;
+}
